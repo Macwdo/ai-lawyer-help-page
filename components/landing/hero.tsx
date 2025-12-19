@@ -2,8 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
+import Link from "next/link"
+import { useWaitlistStore } from "@/lib/stores/waitlist.store"
 
 export function Hero() {
+  const setSource = useWaitlistStore((state) => state.setSource)
+  
   return (
     <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-primary/8 via-primary/3 to-background py-20 md:py-32">
       <div className="container mx-auto px-4">
@@ -25,13 +29,20 @@ export function Hero() {
           </p>
           
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button size="lg" className="group w-full sm:w-auto">
-              Entrar na lista de espera
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto">
-              Ver como funciona
-            </Button>
+            <Link 
+              href="/waitlist"
+              onClick={() => setSource('hero')}
+            >
+              <Button size="lg" className="group w-full sm:w-auto">
+                Entrar na lista de espera
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
+            <Link href="/#solucao">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                Ver como funciona
+              </Button>
+            </Link>
           </div>
         </div>
         

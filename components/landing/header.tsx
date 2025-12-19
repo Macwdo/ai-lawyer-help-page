@@ -5,6 +5,8 @@ import { Moon, Sun, Menu, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useWaitlistStore } from "@/lib/stores/waitlist.store"
 
 const navigation = [
   { name: "Início", href: "#hero" },
@@ -19,16 +21,30 @@ export function Header() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const setSource = useWaitlistStore((state) => state.setSource)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, isHome: boolean) => {
     setMobileMenuOpen(false)
-    const element = document.querySelector(href)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
+    if (pathname !== "/") {
+      // Se não estiver na home, redireciona para home
+      if (isHome) {
+        window.location.href = "/"
+      } else {
+        window.location.href = `/${href}`
+      }
+      return
+    }
+    // Se estiver na home, faz scroll suave
+    if (!isHome) {
+      const element = document.querySelector(href)
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" })
+      }
     }
   }
 
@@ -36,26 +52,35 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <Link href="#hero" className="text-xl font-bold hover:opacity-80 transition-opacity">
+          <Link href="/" className="text-xl font-bold hover:opacity-80 transition-opacity">
             Advogado Inteligente
           </Link>
         </div>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavClick(item.href)
-              }}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {item.name}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            const isHome = item.name === "Início"
+            const href = isHome ? "/" : (pathname === "/" ? item.href : `/${item.href}`)
+            return (
+              <Link
+                key={item.name}
+                href={href}
+                onClick={(e) => {
+                  if (pathname === "/" && !isHome) {
+                    e.preventDefault()
+                    handleNavClick(item.href, false)
+                  } else if (pathname !== "/") {
+                    e.preventDefault()
+                    handleNavClick(item.href, isHome)
+                  }
+                }}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item.name}
+              </Link>
+            )
+          })}
         </nav>
 
         <div className="flex items-center gap-4">
@@ -85,7 +110,12 @@ export function Header() {
             )}
           </Button>
           
-          <Button className="hidden md:inline-flex">Entrar na lista de espera</Button>
+          <Link 
+            href="/waitlist"
+            onClick={() => setSource('header')}
+          >
+            <Button className="hidden md:inline-flex">Entrar na lista de espera</Button>
+          </Link>
         </div>
       </div>
 
@@ -93,21 +123,36 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-background">
           <nav className="container flex flex-col py-4 space-y-2">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleNavClick(item.href)
-                }}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navigation.map((item) => {
+              const isHome = item.name === "Início"
+              const href = isHome ? "/" : (pathname === "/" ? item.href : `/${item.href}`)
+              return (
+                <Link
+                  key={item.name}
+                  href={href}
+                  onClick={(e) => {
+                    if (pathname === "/" && !isHome) {
+                      e.preventDefault()
+                      handleNavClick(item.href, false)
+                    } else if (pathname !== "/") {
+                      e.preventDefault()
+                      handleNavClick(item.href, isHome)
+                    }
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
             <div className="px-4 pt-2">
-              <Button className="w-full">Entrar na lista de espera</Button>
+              <Link 
+                href="/waitlist" 
+                className="w-full block"
+                onClick={() => setSource('header')}
+              >
+                <Button className="w-full">Entrar na lista de espera</Button>
+              </Link>
             </div>
           </nav>
         </div>

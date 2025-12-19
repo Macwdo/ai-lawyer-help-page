@@ -2,8 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { useWaitlistStore } from "@/lib/stores/waitlist.store"
 
 export function CTAFinal() {
+  const setSource = useWaitlistStore((state) => state.setSource)
+  
   return (
     <section className="relative bg-primary/30 py-20 md:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/35 via-primary/30 to-primary/25 backdrop-blur-sm"></div>
@@ -18,10 +22,15 @@ export function CTAFinal() {
           <p className="mb-8 text-lg text-muted-foreground md:text-xl">
             Entre na lista de espera e seja um dos primeiros a transformar seu escritório com IA
           </p>
-          <Button size="lg" className="group">
-            Entrar na lista de espera
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
+          <Link 
+            href="/waitlist"
+            onClick={() => setSource('cta-final')}
+          >
+            <Button size="lg" className="group">
+              Entrar na lista de espera
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
         </div>
       </div>
       </div>

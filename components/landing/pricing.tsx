@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check } from "lucide-react"
+import Link from "next/link"
+import { useWaitlistStore } from "@/lib/stores/waitlist.store"
 
 const plans = [
   {
@@ -58,6 +60,8 @@ const plans = [
 ]
 
 export function Pricing() {
+  const setSource = useWaitlistStore((state) => state.setSource)
+  
   return (
     <section id="planos" className="relative bg-muted py-20 md:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/90 to-muted/80 backdrop-blur-sm"></div>
@@ -114,13 +118,19 @@ export function Pricing() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button 
-                  className="w-full" 
-                  variant={plan.popular ? "default" : "outline"}
-                  disabled={plan.comingSoon}
+                <Link 
+                  href="/waitlist" 
+                  className="w-full"
+                  onClick={() => setSource('pricing')}
                 >
-                  {plan.cta}
-                </Button>
+                  <Button 
+                    className="w-full" 
+                    variant={plan.popular ? "default" : "outline"}
+                    disabled={plan.comingSoon}
+                  >
+                    {plan.cta}
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
           ))}
