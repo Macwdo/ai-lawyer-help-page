@@ -1,89 +1,27 @@
 "use client"
 
-import { useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { create } from 'zustand'
-import { submitWaitlist, validateWaitlistForm } from '@/lib/services/waitlist.service'
-import { WaitlistPayload, WaitlistError } from '@/lib/types/waitlist'
+import { startTransition } from "react"
+import { useMutation } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 
-interface WaitlistState {
-  isLoading: boolean
-  error: WaitlistError | null
-  setLoading: (loading: boolean) => void
-  setError: (error: WaitlistError | null) => void
-  reset: () => void
-}
+import { toWaitlistError, submitWaitlist } from "@/lib/services/waitlist.service"
+import { type WaitlistPayload } from "@/lib/types/waitlist"
 
-const useWaitlistState = create<WaitlistState>((set) => ({
-  isLoading: false,
-  error: null,
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error }),
-  reset: () => set({ isLoading: false, error: null }),
-}))
-
-interface UseWaitlistReturn {
-  isLoading: boolean
-  error: WaitlistError | null
-  submit: (payload: Omit<WaitlistPayload, 'source'> & { source: string }) => Promise<void>
-}
-
-export function useWaitlist(): UseWaitlistReturn {
+export function useWaitlist() {
   const router = useRouter()
-  const isLoading = useWaitlistState((state) => state.isLoading)
-  const error = useWaitlistState((state) => state.error)
-  const setLoading = useWaitlistState((state) => state.setLoading)
-  const setError = useWaitlistState((state) => state.setError)
 
-  const submit = useCallback(
-    async (payload: Omit<WaitlistPayload, 'source'> & { source: string }) => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        // Validação client-side
-        const validationError = validateWaitlistForm(
-          payload.name,
-          payload.email,
-          payload.number
-        )
-
-        if (validationError) {
-          setError(validationError)
-          setLoading(false)
-          return
-        }
-
-        // Enviar para API
-        const waitlistPayload: WaitlistPayload = {
-          source: payload.source,
-          email: payload.email.trim(),
-          number: payload.number.trim(),
-          name: payload.name.trim(),
-        }
-
-        await submitWaitlist(waitlistPayload)
-        
-        // Redirecionar para página de sucesso
-        router.push('/waitlist/sent')
-      } catch (err) {
-        setError({
-          message:
-            err instanceof Error
-              ? err.message
-              : 'Erro ao enviar formulário. Tente novamente.',
-        })
-      } finally {
-        setLoading(false)
-      }
+  const mutation = useMutation({
+    mutationFn: submitWaitlist,
+    onSuccess: () => {
+      startTransition(() => {
+        router.push("/waitlist/sent")
+      })
     },
-    [router, setLoading, setError]
-  )
+  })
 
   return {
-    isLoading,
-    error,
-    submit,
+    isLoading: mutation.isPending,
+    error: mutation.error ? toWaitlistError(mutation.error) : null,
+    submit: (payload: WaitlistPayload) => mutation.mutateAsync(payload),
   }
 }
-
