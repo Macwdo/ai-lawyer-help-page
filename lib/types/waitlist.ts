@@ -1,7 +1,7 @@
 export type WaitlistSource = 'header' | 'hero' | 'cta-final' | 'pricing' | 'unknown'
 
 export interface WaitlistPayload {
-  source: string
+  source: WaitlistSource
   email: string
   number: string
   name: string
@@ -15,6 +15,5 @@ export interface WaitlistResponse {
 
 export interface WaitlistError {
   message: string
-  field?: string
+  field?: "name" | "email" | "number"
 }
-

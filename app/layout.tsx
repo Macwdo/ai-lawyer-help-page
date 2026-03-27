@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+
+import { AppProviders } from "@/components/providers/app-providers"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,16 +28,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} ${sourceSerif.variable} font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )
 }
-

@@ -8,6 +8,10 @@ Landing page moderna e profissional para o produto SaaS "Advogado Inteligente", 
 - **TypeScript**
 - **Tailwind CSS**
 - **shadcn/ui**
+- **Axios**
+- **TanStack Query**
+- **React Hook Form + Zod**
+- **Zustand**
 - **Lucide React** (ícones)
 - **next-themes** (dark mode)
 
@@ -15,16 +19,16 @@ Landing page moderna e profissional para o produto SaaS "Advogado Inteligente", 
 
 ```bash
 # Instalar dependências
-npm install
+pnpm install
 
 # Rodar em desenvolvimento
-npm run dev
+pnpm dev
 
 # Build para produção
-npm run build
+pnpm build
 
 # Iniciar servidor de produção
-npm start
+pnpm start
 ```
 
 A aplicação estará disponível em `http://localhost:3000`
@@ -66,6 +70,14 @@ Componentes UI base em `components/ui/`:
 - `badge.tsx`
 - `tabs.tsx`
 
+## 🔌 Stack da Waitlist
+
+- Cliente HTTP compartilhado em `lib/axios.ts`
+- Provider global do React Query montado no layout raiz
+- Estado local de origem do CTA em `lib/stores/waitlist.store.ts`
+- Validação do formulário com `zod` em `lib/schemas/waitlist.ts`
+- Mutação de envio centralizada em `lib/hooks/useWaitlist.ts`
+
 ## 🌙 Dark Mode
 
 O dark mode está totalmente funcional e pode ser alternado através do botão no header. O tema é persistido usando `next-themes`.
@@ -81,4 +93,3 @@ O dark mode está totalmente funcional e pode ser alternado através do botão n
 ## 📄 Licença
 
 Este projeto é privado e proprietário.
-
